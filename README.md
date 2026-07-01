@@ -4,6 +4,8 @@ A minimalist, privacy-focused blogging/pasting platform designed for quick conte
 
 [Demo](https://blog-one-dun-49.vercel.app/)
 
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/irhdab/kitepad&env=PGHOST,PGDATABASE,PGUSER,PGPASSWORD,PGPORT)
+
 ## Features
 
 - **Privacy & Security**:
@@ -29,6 +31,8 @@ A minimalist, privacy-focused blogging/pasting platform designed for quick conte
   - **Raw Access**: Direct access to raw text by adding `&raw=1` to the URL.
   - **No Accounts**: Instant publishing without registration.
   - **Lightweight**: Fast loading with a curated minimalist design system.
+  - **RSS Feed**: Subscribe to public posts at `/rss`.
+  - **Embed Widget**: Embed public posts using `<script src="/embed.js?uid=...">`.
 
 ## Getting Started
 

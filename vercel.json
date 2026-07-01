@@ -6,6 +6,10 @@
   },
   "rewrites": [
     { "source": "/save", "destination": "/api/save_content.php" },
+    { "source": "/react", "destination": "/api/react.php" },
+    { "source": "/rss", "destination": "/api/rss.php" },
+    { "source": "/embed.js", "destination": "/api/embed.php" },
+    { "source": "/og-image", "destination": "/api/og-image.php" },
     { "source": "/view", "destination": "/api/view_content.php" },
     { "source": "/v/:id", "destination": "/api/view_content.php?id=:id" }
   ]

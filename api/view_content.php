@@ -15,8 +15,14 @@ function verify_post_password($pdo, &$post, $password_attempt, $csrf_token) {
     }
 
     if ($_SERVER['REQUEST_METHOD'] === 'POST' && $password_attempt) {
+        if (!check_rate_limit($pdo, "unlock_" . $post['uid'], 5, 900)) {
+            $post['password_error'] = "Too many unlock attempts. Please wait 15 minutes and try again.";
+            return false;
+        }
+
         // CSRF check
         if (empty($csrf_token) || !isset($_SESSION['csrf_token']) || !hash_equals($_SESSION['csrf_token'], $csrf_token)) {
+            $post['password_error'] = "Invalid security token.";
             return false;
         }
 
@@ -30,6 +36,8 @@ function verify_post_password($pdo, &$post, $password_attempt, $csrf_token) {
             ]);
             return true;
         }
+
+        $post['password_error'] = "Incorrect password.";
     }
 
     $post['content'] = null; // Hide content if not verified
@@ -45,11 +53,12 @@ function handle_single_view($pdo, $uid) {
     $stmt->execute([$uid]);
     $post = $stmt->fetch();
 
-    if (!$post) return [null, true];
+    if (!$post) return [[], true, false, 1, null, ["👍" => 0, "🔥" => 0, "💯" => 0], false, true];
 
     $password_attempt = $_POST['password'] ?? null;
     $csrf_token = $_POST['csrf_token'] ?? '';
     $password_correct = verify_post_password($pdo, $post, $password_attempt, $csrf_token);
+    $passwordError = $post['password_error'] ?? null;
 
     if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'delete') {
         if ($password_correct) {
@@ -87,7 +96,9 @@ function handle_single_view($pdo, $uid) {
         exit;
     }
 
-    return [[$post], true];
+    $reactionCounts = get_reaction_counts_for_uid($pdo, $post['uid']);
+
+    return [[$post], true, false, 1, $passwordError, $reactionCounts, !empty($post['password_hash']), $password_correct];
 }
 
 function handle_list_view($pdo) {
@@ -129,9 +140,43 @@ function handle_list_view($pdo) {
 try {
     header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
     $uid = $_GET['id'] ?? null;
+    $lang = strtolower($_GET['lang'] ?? $_COOKIE['kitepad_lang'] ?? substr($_SERVER['HTTP_ACCEPT_LANGUAGE'] ?? 'en', 0, 2));
+    $lang = $lang === 'ko' ? 'ko' : 'en';
+    setcookie('kitepad_lang', $lang, [
+        'expires' => time() + 86400 * 365,
+        'path' => '/',
+        'samesite' => 'Lax'
+    ]);
+
+    $passwordError = null;
+    $reactionCounts = ["👍" => 0, "🔥" => 0, "💯" => 0];
+    $hasPassword = false;
+    $passwordCorrect = true;
+    $ogData = [
+        'title' => 'KitePad',
+        'description' => 'Zero-knowledge pastebin for secure sharing.',
+        'url' => (isset($_SERVER['HTTPS']) ? 'https://' : 'http://') . ($_SERVER['HTTP_HOST'] ?? 'localhost') . '/view',
+        'image' => (isset($_SERVER['HTTPS']) ? 'https://' : 'http://') . ($_SERVER['HTTP_HOST'] ?? 'localhost') . '/og-image?title=' . rawurlencode('KitePad')
+    ];
 
     if ($uid) {
-        list($result, $isSingle) = handle_single_view($pdo, $uid);
+        list($result, $isSingle, $hasNext, $currentPage, $passwordError, $reactionCounts, $hasPassword, $passwordCorrect) = handle_single_view($pdo, $uid);
+        if (!empty($result[0])) {
+            $item = $result[0];
+            $host = ($_SERVER['HTTP_HOST'] ?? 'localhost');
+            $scheme = isset($_SERVER['HTTPS']) ? 'https://' : 'http://';
+            $title = !empty($item['title']) ? $item['title'] : 'KitePad Paste';
+            $description = 'Secure paste on KitePad';
+            if (empty($item['is_encrypted']) && !empty($item['content'])) {
+                $description = mb_substr(trim(preg_replace('/\s+/', ' ', strip_tags($item['content']))), 0, 180);
+            }
+            $ogData = [
+                'title' => $title,
+                'description' => $description,
+                'url' => $scheme . $host . '/v/' . $item['uid'],
+                'image' => $scheme . $host . '/og-image?title=' . rawurlencode($title)
+            ];
+        }
     } else {
         list($result, $isSingle, $hasNext, $currentPage) = handle_list_view($pdo);
     }

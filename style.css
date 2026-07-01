@@ -23,6 +23,28 @@
     color: var(--text-primary);
 }
 
+.lang-switcher {
+    display: inline-flex;
+    gap: 0;
+}
+
+.active-lang {
+    color: var(--text-primary);
+    font-weight: 700;
+}
+
+.theme-picker-wrap {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.theme-picker-wrap label {
+    font-size: 12px;
+    color: var(--text-secondary);
+}
+
 * {
   box-sizing: border-box;
   margin: 0;
@@ -283,6 +305,13 @@ hr {
 
 .actions {
   margin-top: 10px;
+}
+
+.reactions {
+    margin-top: 10px;
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
 }
 
 .share-link {

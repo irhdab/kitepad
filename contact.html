@@ -4,10 +4,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Contact - KitePad</title>
+    <meta name="description" content="Contact KitePad support.">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="KitePad">
+    <meta property="og:title" content="Contact - KitePad">
+    <meta property="og:description" content="Contact KitePad support.">
+    <meta property="og:image" content="/og-image?title=KitePad">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Exo+2:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+    <link rel="manifest" href="/manifest.json">
     <link rel="stylesheet" href="/style.css">
+    <script src="/i18n.js"></script>
     <style>
         .contact-container {
             max-width: 800px;
@@ -47,15 +55,19 @@
 <body>
     <div class="contact-container">
         <div class="nav-links">
-            <a href="/" class="nav-link">← Back</a>
+            <a href="/" class="nav-link" data-i18n="nav.back">← Back</a>
+            <span class="lang-switcher">
+                <a href="?lang=en" class="nav-link" data-lang-switch="en" data-i18n="lang.en">EN</a>
+                <a href="?lang=ko" class="nav-link" data-lang-switch="ko" data-i18n="lang.ko">KO</a>
+            </span>
         </div>
         <div class="contact-header">
-            <h1>Contact</h1>
-            <p>If you have any questions, please contact us at the email address below.</p>
+            <h1 data-i18n="contact.title">Contact</h1>
+            <p data-i18n="contact.subtitle">If you have any questions, please contact us at the email address below.</p>
         </div>
 
         <div class="contact-info">
-            <div style="font-size: 14px; color: #888; margin-bottom: 10px;">Email Support</div>
+            <div style="font-size: 14px; color: #888; margin-bottom: 10px;" data-i18n="contact.support">Email Support</div>
             <div id="email-placeholder"></div>
         </div>
 
@@ -73,15 +85,21 @@
         </script>
 
         <div class="policy-section" style="text-align: left; margin-top: 40px;">
-            <p>We typically try to respond within 24 hours. We welcome any feedback, including service suggestions or bug reports.</p>
+            <p data-i18n="contact.response">We typically try to respond within 24 hours. We welcome any feedback, including service suggestions or bug reports.</p>
         </div>
     </div>
 
     <footer class="site-footer">
         <div class="container">
             <hr>
-            <p>&copy; 2026 KitePad. All rights reserved. <a href="/privacy.html" class="nav-link">Privacy Policy</a></p>
+            <p>&copy; 2026 KitePad. <span data-i18n="footer.rights">All rights reserved.</span> <a href="/privacy.html" class="nav-link" data-i18n="nav.privacy">Privacy Policy</a></p>
         </div>
     </footer>
+    <script>
+        if (window.KiteI18n) window.KiteI18n.init();
+        if ("serviceWorker" in navigator) {
+            navigator.serviceWorker.register("/sw.js").catch(() => {});
+        }
+    </script>
 </body>
 </html>

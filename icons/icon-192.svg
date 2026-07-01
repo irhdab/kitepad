@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192" role="img" aria-label="KitePad icon">
+  <rect width="192" height="192" rx="28" fill="#0d0d0d"/>
+  <rect x="18" y="18" width="156" height="156" rx="18" fill="#161616" stroke="#2a2a2a"/>
+  <path d="M58 48h18v42l39-42h22l-43 46 45 50h-24L76 99v45H58z" fill="#ffffff"/>
+</svg>

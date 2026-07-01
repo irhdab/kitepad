@@ -6,6 +6,7 @@ $db = getenv('PGDATABASE');
 $user = getenv('PGUSER');
 $pass = getenv('PGPASSWORD');
 $port = getenv('PGPORT') ?: "5432";
+$endpoint = getenv('PGENDPOINT') ?: '';
 
 if (!$host || !$db || !$user || !$pass) {
     throw new \PDOException("Missing database environment variables. Please check your Vercel settings or local environment.");
@@ -18,7 +19,10 @@ header("X-Content-Type-Options: nosniff");
 header("X-Frame-Options: SAMEORIGIN");
 header("Referrer-Policy: strict-origin-when-cross-origin");
 
-$dsn = "pgsql:host=$host;port=$port;dbname=$db;sslmode=require;options='endpoint=ep-proud-hill-ai7aun9w'";
+$dsn = "pgsql:host=$host;port=$port;dbname=$db;sslmode=require";
+if ($endpoint !== '') {
+    $dsn .= ";options='endpoint=$endpoint'";
+}
 $options = [
     PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
     PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
@@ -44,14 +48,7 @@ if (empty($_COOKIE['csrf_token'])) {
 
 function check_rate_limit($pdo, $key, $limit, $window_seconds)
 {
-    // Use HTTP_X_FORWARDED_FOR for Vercel/Cloudflare, fallback to REMOTE_ADDR
-    $ip = 'unknown';
-    if (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
-        $ipList = explode(',', $_SERVER['HTTP_X_FORWARDED_FOR']);
-        $ip = trim($ipList[0]);
-    } else if (!empty($_SERVER['REMOTE_ADDR'])) {
-        $ip = $_SERVER['REMOTE_ADDR'];
-    }
+    $ip = get_client_ip();
 
     $identifier = "rl_" . $key . "_" . $ip;
 
@@ -71,6 +68,31 @@ function check_rate_limit($pdo, $key, $limit, $window_seconds)
         $stmt->execute([$identifier]);
     }
     return true;
+}
+
+function get_client_ip()
+{
+    if (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+        $ipList = explode(',', $_SERVER['HTTP_X_FORWARDED_FOR']);
+        return trim($ipList[0]);
+    }
+    if (!empty($_SERVER['REMOTE_ADDR'])) {
+        return $_SERVER['REMOTE_ADDR'];
+    }
+    return 'unknown';
+}
+
+function get_reaction_counts_for_uid($pdo, $uid)
+{
+    $counts = ["👍" => 0, "🔥" => 0, "💯" => 0];
+    $stmt = $pdo->prepare("SELECT emoji, COUNT(*) AS count FROM reactions WHERE writing_uid = ? GROUP BY emoji");
+    $stmt->execute([$uid]);
+    while ($row = $stmt->fetch()) {
+        if (array_key_exists($row['emoji'], $counts)) {
+            $counts[$row['emoji']] = (int)$row['count'];
+        }
+    }
+    return $counts;
 }
 
 function run_migrations($pdo)
@@ -125,6 +147,19 @@ function run_migrations($pdo)
 
         $ensureColumn($pdo, 'writings', 'title', "TEXT NULL");
         $ensureColumn($pdo, 'writings', 'edit_token_hash', "TEXT NULL");
+
+        $stmt = $pdo->query("SELECT 1 FROM information_schema.tables WHERE table_name = 'reactions'");
+        if (!$stmt->fetch()) {
+            $pdo->exec("CREATE TABLE reactions (
+                id SERIAL PRIMARY KEY,
+                writing_uid VARCHAR(36) NOT NULL,
+                emoji VARCHAR(8) NOT NULL,
+                ip_hash VARCHAR(64) NOT NULL,
+                created_at TIMESTAMP DEFAULT NOW(),
+                UNIQUE (writing_uid, emoji, ip_hash)
+            )");
+            $pdo->exec("CREATE INDEX idx_reactions_uid ON reactions(writing_uid)");
+        }
 
     } catch (Exception $e) {
         error_log("Migration error: " . $e->getMessage());

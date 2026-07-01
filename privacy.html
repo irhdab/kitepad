@@ -4,10 +4,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Privacy Policy - KitePad</title>
+    <meta name="description" content="KitePad privacy policy.">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="KitePad">
+    <meta property="og:title" content="Privacy Policy - KitePad">
+    <meta property="og:description" content="KitePad privacy policy.">
+    <meta property="og:image" content="/og-image?title=KitePad">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Exo+2:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+    <link rel="manifest" href="/manifest.json">
     <link rel="stylesheet" href="/style.css">
+    <script src="/i18n.js"></script>
     <style>
         .policy-container {
             max-width: 800px;
@@ -85,11 +93,15 @@
 <body>
     <div class="policy-container">
         <div class="nav-links">
-            <a href="/" class="nav-link">← Back</a>
+            <a href="/" class="nav-link" data-i18n="nav.back">← Back</a>
+            <span class="lang-switcher">
+                <a href="?lang=en" class="nav-link" data-lang-switch="en" data-i18n="lang.en">EN</a>
+                <a href="?lang=ko" class="nav-link" data-lang-switch="ko" data-i18n="lang.ko">KO</a>
+            </span>
         </div>
         <div class="policy-header">
             <div>
-                <h1>Privacy Policy</h1>
+                <h1 data-i18n="privacy.title">Privacy Policy</h1>
                 <p>Version: 1.1 (GDPR Compliant)<br>Effective Date: February 25, 2026</p>
             </div>
         </div>
@@ -214,8 +226,14 @@
     <footer class="site-footer">
         <div class="container">
             <hr>
-        <p>&copy; 2026 KitePad. All rights reserved. <a href="https://github.com/irhdab/kitepad/tree/main" class="nav-link" target="_blank">GitHub</a> | <a href="/contact.html" class="nav-link">Contact</a> | <a href="/privacy.html" class="nav-link">Privacy Policy</a></p>
+        <p>&copy; 2026 KitePad. <span data-i18n="footer.rights">All rights reserved.</span> <a href="https://github.com/irhdab/kitepad/tree/main" class="nav-link" target="_blank" data-i18n="common.github">GitHub</a> | <a href="/contact.html" class="nav-link" data-i18n="nav.contact">Contact</a> | <a href="/privacy.html" class="nav-link" data-i18n="nav.privacy">Privacy Policy</a></p>
         </div>
     </footer>
+    <script>
+        if (window.KiteI18n) window.KiteI18n.init();
+        if ("serviceWorker" in navigator) {
+            navigator.serviceWorker.register("/sw.js").catch(() => {});
+        }
+    </script>
 </body>
 </html>

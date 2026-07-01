@@ -4,22 +4,35 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KitePad - View</title>
+    <title><?= htmlspecialchars($ogData['title'] ?? 'KitePad - View') ?></title>
+    <meta name="description" content="<?= htmlspecialchars($ogData['description'] ?? 'Zero-knowledge pastebin for secure sharing.') ?>">
+    <meta property="og:type" content="<?= $isSingle ? 'article' : 'website' ?>">
+    <meta property="og:site_name" content="KitePad">
+    <meta property="og:title" content="<?= htmlspecialchars($ogData['title'] ?? 'KitePad') ?>">
+    <meta property="og:description" content="<?= htmlspecialchars($ogData['description'] ?? 'Zero-knowledge pastebin for secure sharing.') ?>">
+    <meta property="og:url" content="<?= htmlspecialchars($ogData['url'] ?? '') ?>">
+    <meta property="og:image" content="<?= htmlspecialchars($ogData['image'] ?? '/og-image?title=KitePad') ?>">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="<?= htmlspecialchars($ogData['title'] ?? 'KitePad') ?>">
+    <meta name="twitter:description" content="<?= htmlspecialchars($ogData['description'] ?? 'Zero-knowledge pastebin for secure sharing.') ?>">
+    <meta name="twitter:image" content="<?= htmlspecialchars($ogData['image'] ?? '/og-image?title=KitePad') ?>">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Exo+2:ital,wght@0,100..900;1,100..900&display=swap"
         rel="stylesheet">
+    <link rel="manifest" href="/manifest.json">
+    <script src="/i18n.js"></script>
     <link rel="stylesheet" href="/style.css">
-    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js" integrity="sha384-948ahk4ZmxYVYOc+rxN1H2gM1EJ2Duhp7uHtZ4WSLkV4Vtx5MUqnV+l7u9B+jFv+" crossorigin="anonymous"></script>
+    <link id="hljs-theme" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css" integrity="sha384-wH75j6z1lH97ZOpMOInqhgKzFkAInZPPSPlZpYKYTOqsaizPvhQZmAtLcPKXpLyH" crossorigin="anonymous">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" integrity="sha384-F/bZzf7p3Joyp5psL90p/p89AZJsndkSoGwRpXcZhleCWhd8SnRuoYo4d0yirjJp" crossorigin="anonymous"></script>
     <script
-        src="https://cdn.jsdelivr.net/npm/highlightjs-line-numbers.js@2.8.0/dist/highlightjs-line-numbers.min.js"></script>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.6/dist/purify.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/gh/davidshimjs/qrcodejs@master/qrcode.min.js"></script>
+        src="https://cdn.jsdelivr.net/npm/highlightjs-line-numbers.js@2.8.0/dist/highlightjs-line-numbers.min.js" integrity="sha384-+ch8x/dgaV//v6Sa8m4v5+7KScnpCuxHqilN8njQ013CEKg3Fbd8Q3oN9tfpouLh" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" integrity="sha384-n8MVd4RsNIU0tAv4ct0nTaAbDJwPJzDEaqSD1odI+WdtXRGWt2kTvGFasHpSy3SV" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js" integrity="sha384-XjKyOOlGwcjNTAIQHIpgOno0Hl1YQqzUOEleOLALmuqehneUG+vnGctmUb0ZY0l8" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" integrity="sha384-+VBxd3r6XgURycqtZ117nYw44OOcIax56Z4dCRWbxyPt0Koah1uHoK0o4+/RRE05" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.6/dist/purify.min.js" integrity="sha384-cwS6YdhLI7XS60eoDiC+egV0qHp8zI+Cms46R0nbn8JrmoAzV9uFL60etMZhAnSu" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/gh/davidshimjs/qrcodejs@master/qrcode.min.js" integrity="sha384-3zSEDfvllQohrq0PHL1fOXJuC/jSOO34H46t6UQfobFOmxE5BpjjaIJY5F2/bMnU" crossorigin="anonymous"></script>
     <style>
         /* Minimalist line numbers style */
         .hljs-ln-numbers {
@@ -84,6 +97,41 @@
         }
     </style>
     <script>
+        const tr = (key, fallback = "") => (window.KiteI18n ? window.KiteI18n.t(key, fallback) : (fallback || key));
+        const HLJS_THEMES = {
+            "github-dark": {
+                href: "https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css",
+                integrity: "sha384-wH75j6z1lH97ZOpMOInqhgKzFkAInZPPSPlZpYKYTOqsaizPvhQZmAtLcPKXpLyH"
+            },
+            "monokai-sublime": {
+                href: "https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/monokai-sublime.min.css",
+                integrity: "sha384-fPmRQ3GXo2iBk8Sgxizmu0IOOv+vAPjYXqCHNut2KSkSBleqjCd7FpBJwrfyCfGc"
+            },
+            "atom-one-dark": {
+                href: "https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css",
+                integrity: "sha384-oaMLBGEzBOJx3UHwac0cVndtX5fxGQIfnAeFZ35RTgqPcYlbprH9o9PUV/F8Le07"
+            },
+            "nord": {
+                href: "https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/nord.min.css",
+                integrity: "sha384-O/y538KpolLjYHZH8xqC17hcGWgjOw79vqDDhXNIT6Q7q3O5KVr29xbsaq9k6fSL"
+            },
+            "night-owl": {
+                href: "https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/night-owl.min.css",
+                integrity: "sha384-xMH/akAd4WIJSWGsUlveLGugns8GuYeJglqHRpASAW0sSbPNVM+BIa4Xa/50+uaJ"
+            }
+        };
+
+        function applyHighlightTheme(themeName) {
+            const theme = HLJS_THEMES[themeName] || HLJS_THEMES["github-dark"];
+            const tag = document.getElementById("hljs-theme");
+            tag.href = theme.href;
+            tag.integrity = theme.integrity;
+            tag.crossOrigin = "anonymous";
+            localStorage.setItem("kitepad_hljs_theme", themeName);
+            const select = document.getElementById("theme-select");
+            if (select) select.value = themeName;
+        }
+
         // E2EE Decryption
         async function deriveKey(password, salt) {
             const encoder = new TextEncoder();
@@ -117,7 +165,7 @@
                 document.getElementById(`decrypt-prompt-${id}`)?.remove();
                 renderContent(id, decrypted);
             } catch (e) {
-                alert("Decryption failed. Incorrect password?");
+                alert(tr("alert.decryptFailed", "Decryption failed. Incorrect password?"));
             }
         }
 
@@ -132,7 +180,7 @@
                 prompt.remove();
                 renderContent(id, decrypted);
             } catch (e) {
-                alert("Decryption failed. Incorrect password?");
+                alert(tr("alert.decryptFailed", "Decryption failed. Incorrect password?"));
             }
         }
 
@@ -193,27 +241,27 @@
         function copyCurrentUrl() {
             const url = window.location.origin + window.location.pathname;
             navigator.clipboard.writeText(url).then(() => {
-                alert("Link copied to clipboard!");
+                alert(tr("alert.linkCopied", "Link copied to clipboard!"));
             });
         }
 
         function copyContent(elementId) {
             const element = document.getElementById(elementId);
             navigator.clipboard.writeText(element.innerText).then(() => {
-                alert("Content copied to clipboard!");
+                alert(tr("alert.contentCopied", "Content copied to clipboard!"));
             });
         }
 
         function copyText(text) {
             navigator.clipboard.writeText(text).then(() => {
-                alert("Copied to clipboard!");
+                alert(tr("alert.copied", "Copied to clipboard!"));
             });
         }
 
         function copyShareLink(id) {
             const shareUrl = window.location.origin + '/v/' + id;
             navigator.clipboard.writeText(shareUrl).then(() => {
-                alert("Link copied to clipboard!");
+                alert(tr("alert.linkCopied", "Link copied to clipboard!"));
             });
         }
 
@@ -241,24 +289,84 @@
         function toggleZenMode() {
             document.body.classList.toggle('zen-mode');
         }
+
+        async function loadReactions(uid) {
+            try {
+                const res = await fetch(`/react?uid=${encodeURIComponent(uid)}`);
+                if (!res.ok) return;
+                const data = await res.json();
+                Object.entries(data.counts || {}).forEach(([emoji, count]) => {
+                    const span = document.querySelector(`.reaction-count[data-uid="${uid}"][data-emoji="${emoji}"]`);
+                    if (span) span.textContent = String(count);
+                });
+            } catch (_) {}
+        }
+
+        async function toggleReaction(uid, emoji) {
+            try {
+                const res = await fetch('/react', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ uid, emoji })
+                });
+                if (!res.ok) return;
+                const data = await res.json();
+                Object.entries(data.counts || {}).forEach(([name, count]) => {
+                    const span = document.querySelector(`.reaction-count[data-uid="${uid}"][data-emoji="${name}"]`);
+                    if (span) span.textContent = String(count);
+                });
+            } catch (_) {}
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            if (window.KiteI18n) window.KiteI18n.init();
+            const savedTheme = localStorage.getItem("kitepad_hljs_theme") || "github-dark";
+            applyHighlightTheme(savedTheme);
+            const themeSelect = document.getElementById("theme-select");
+            if (themeSelect) {
+                themeSelect.addEventListener("change", (e) => applyHighlightTheme(e.target.value));
+            }
+            document.querySelectorAll('[data-reaction-uid]').forEach((el) => {
+                const uid = el.getAttribute('data-reaction-uid');
+                loadReactions(uid);
+            });
+            if ("serviceWorker" in navigator) {
+                navigator.serviceWorker.register("/sw.js").catch(() => {});
+            }
+        });
     </script>
 </head>
 
 <body>
     <div class="container">
         <div class="nav-links">
-            <a href="/" class="nav-link">Create New Paste</a>
-            <a href="/view" class="nav-link">View Posts</a>
-            <a href="https://github.com/irhdab/kitepad/tree/main" class="nav-link" target="_blank">GitHub</a>
+            <a href="/" class="nav-link" data-i18n="nav.create">Create New Paste</a>
+            <a href="/view" class="nav-link" data-i18n="nav.view">View Posts</a>
+            <a href="/rss" class="nav-link" target="_blank">RSS</a>
+            <a href="https://github.com/irhdab/kitepad/tree/main" class="nav-link" target="_blank" data-i18n="common.github">GitHub</a>
+            <span class="lang-switcher">
+                <a href="?lang=en" class="nav-link" data-lang-switch="en" data-i18n="lang.en">EN</a>
+                <a href="?lang=ko" class="nav-link" data-lang-switch="ko" data-i18n="lang.ko">KO</a>
+            </span>
+        </div>
+        <div class="theme-picker-wrap">
+            <label for="theme-select">Syntax Theme</label>
+            <select id="theme-select" class="style-select">
+                <option value="github-dark">GitHub Dark</option>
+                <option value="monokai-sublime">Monokai Sublime</option>
+                <option value="atom-one-dark">Atom One Dark</option>
+                <option value="nord">Nord</option>
+                <option value="night-owl">Night Owl</option>
+            </select>
         </div>
         <div class="header-main">
-            <h1 class="title-text"><?php echo $isSingle ? "Paste Detail" : "Public Pastes"; ?></h1>
-            <span class="tagline">Zero-knowledge pastebin. Configure expiry, view limit and end‑to‑end encryption in one
+            <h1 class="title-text" data-i18n="<?= $isSingle ? 'view.single' : 'view.list' ?>"><?php echo $isSingle ? "Paste Detail" : "Public Pastes"; ?></h1>
+            <span class="tagline" data-i18n="tagline">Zero-knowledge pastebin. Configure expiry, view limit and end‑to‑end encryption in one
                 place.</span>
         </div>
 
         <div id="secret-banner" class="secret-banner hidden">
-            <span>⚠️ Looks like this might contain credentials. Make sure you trust the recipient.</span>
+            <span>⚠️ <span data-i18n="index.secretWarning">Looks like this might contain credentials. Make sure you trust the recipient.</span></span>
         </div>
 
         <?php if (isset($burnMessage)): ?>
@@ -267,14 +375,14 @@
 
         <?php if ($isSingle && isset($hasPassword) && $hasPassword && !$passwordCorrect): ?>
             <div class="entry">
-                <p>This paste is password protected.</p>
+                <p data-i18n="view.protected">This paste is password protected.</p>
                 <?php if (isset($passwordError)): ?>
                     <p style="color: #ff5555;"><?php echo $passwordError; ?></p>
                 <?php endif; ?>
                 <form method="POST">
                     <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">
                     <input type="password" name="password" class="style-input" placeholder="Enter password" required>
-                    <button type="submit" class="copy-btn">Unlock</button>
+                    <button type="submit" class="copy-btn" data-i18n="view.unlock">Unlock</button>
                 </form>
             </div>
         <?php elseif (!empty($result)): ?>
@@ -292,7 +400,7 @@
                                 <form onsubmit="handleDecryptFromAttr(event, '<?php echo $row['id']; ?>')">
                                     <input type="password" id="decrypt-pw-<?php echo $row['id']; ?>" class="style-input"
                                         placeholder="Password to decrypt" required>
-                                    <button type="submit" class="copy-btn">Decrypt Content</button>
+                                    <button type="submit" class="copy-btn" data-i18n="view.decrypt">Decrypt Content</button>
                                 </form>
                             </div>
                         <?php else: ?>
@@ -313,21 +421,27 @@
                     <div class="timestamp">Saved on: <?php echo $row['created_at']; ?></div>
                     <div class="actions">
                         <?php if ($isSingle): ?>
-                            <button class="copy-btn" onclick="copyCurrentUrl()">Copy Link</button>
-                            <button class="copy-btn" onclick="toggleQRCode()">QR Code</button>
-                            <button class="copy-btn" onclick="toggleZenMode()">Zen Mode</button>
-                            <button class="copy-btn" onclick="copyContent('content-<?php echo $row['id']; ?>')">Copy
+                            <button class="copy-btn" onclick="copyCurrentUrl()" data-i18n="view.copyLink">Copy Link</button>
+                            <button class="copy-btn" onclick="toggleQRCode()" data-i18n="view.qr">QR Code</button>
+                            <button class="copy-btn" onclick="toggleZenMode()" data-i18n="view.zen">Zen Mode</button>
+                            <button class="copy-btn" onclick="copyContent('content-<?php echo $row['id']; ?>')" data-i18n="view.copyContent">Copy
                                 Content</button>
                             <div id="qrcode-wrapper"
                                 style="display: none; margin-top: 15px; padding: 15px; background: white; border-radius: 8px; width: fit-content;">
                                 <div id="qrcode"></div>
-                                <p style="color: #333; font-size: 11px; margin-top: 8px; text-align: center; margin-bottom: 0;">Scan
+                                <p style="color: #333; font-size: 11px; margin-top: 8px; text-align: center; margin-bottom: 0;" data-i18n="view.scanShare">Scan
                                     to share</p>
                             </div>
                             <button class="copy-btn"
-                                onclick="location.href='/?edit=<?php echo $row['uid'] ?: $row['id']; ?>'">Edit</button>
+                                onclick="location.href='/?edit=<?php echo $row['uid'] ?: $row['id']; ?>'" data-i18n="view.edit">Edit</button>
                             <button class="copy-btn"
-                                onclick="location.href='/?clone=<?php echo $row['uid'] ?: $row['id']; ?>'">Clone</button>
+                                onclick="location.href='/?clone=<?php echo $row['uid'] ?: $row['id']; ?>'" data-i18n="view.clone">Clone</button>
+                            <button class="copy-btn" onclick="copyText('<script src=&quot;' + window.location.origin + '/embed.js?uid=<?php echo $row['uid']; ?>&quot;><\/script>')" data-i18n="view.copyEmbed">Copy Embed Code</button>
+                            <div class="reactions" data-reaction-uid="<?php echo $row['uid']; ?>">
+                                <button class="copy-btn" onclick="toggleReaction('<?php echo $row['uid']; ?>','👍')">👍 <span class="reaction-count" data-uid="<?php echo $row['uid']; ?>" data-emoji="👍"><?php echo $reactionCounts['👍'] ?? 0; ?></span></button>
+                                <button class="copy-btn" onclick="toggleReaction('<?php echo $row['uid']; ?>','🔥')">🔥 <span class="reaction-count" data-uid="<?php echo $row['uid']; ?>" data-emoji="🔥"><?php echo $reactionCounts['🔥'] ?? 0; ?></span></button>
+                                <button class="copy-btn" onclick="toggleReaction('<?php echo $row['uid']; ?>','💯')">💯 <span class="reaction-count" data-uid="<?php echo $row['uid']; ?>" data-emoji="💯"><?php echo $reactionCounts['💯'] ?? 0; ?></span></button>
+                            </div>
                             <?php if ($hasPassword): ?>
                                 <hr style="margin: 10px 0; border-top: 1px solid #222;">
                                 <form method="POST" style="display: inline-block;">
@@ -341,13 +455,13 @@
                             <?php endif; ?>
                         <?php else: ?>
                             <a href="/v/<?php echo $row['uid'] ?: $row['id']; ?>" class="copy-btn"
-                                style="text-decoration: none; display: inline-block;">View</a>
-                            <button class="copy-btn" onclick="copyShareLink('<?php echo $row['uid'] ?: $row['id']; ?>')">Copy
+                                style="text-decoration: none; display: inline-block;" data-i18n="view.view">View</a>
+                            <button class="copy-btn" onclick="copyShareLink('<?php echo $row['uid'] ?: $row['id']; ?>')" data-i18n="view.copyLink">Copy
                                 Link</button>
                             <button class="copy-btn"
-                                onclick="location.href='/?clone=<?php echo $row['uid'] ?: $row['id']; ?>'">Clone</button>
+                                onclick="location.href='/?clone=<?php echo $row['uid'] ?: $row['id']; ?>'" data-i18n="view.clone">Clone</button>
                             <button class="copy-btn"
-                                onclick="copyText(<?php echo htmlspecialchars(json_encode($row['content'])); ?>)">Copy
+                                onclick="copyText(<?php echo htmlspecialchars(json_encode($row['content'])); ?>)" data-i18n="view.copyRaw">Copy
                                 Raw</button>
                         <?php endif; ?>
                     </div>
@@ -367,33 +481,33 @@
             <?php if (!$isSingle): ?>
                 <div class="pagination">
                     <?php if ($currentPage > 1): ?>
-                        <a href="/view?page=<?php echo $currentPage - 1; ?>" class="copy-btn nav-btn">Previous</a>
+                        <a href="/view?page=<?php echo $currentPage - 1; ?>" class="copy-btn nav-btn" data-i18n="view.previous">Previous</a>
                     <?php else: ?>
-                        <button class="copy-btn nav-btn" disabled>Previous</button>
+                        <button class="copy-btn nav-btn" disabled data-i18n="view.previous">Previous</button>
                     <?php endif; ?>
 
                     <span class="page-info">Page <?php echo $currentPage; ?></span>
 
                     <?php if ($hasNext): ?>
-                        <a href="/view?page=<?php echo $currentPage + 1; ?>" class="copy-btn nav-btn">Next</a>
+                        <a href="/view?page=<?php echo $currentPage + 1; ?>" class="copy-btn nav-btn" data-i18n="view.next">Next</a>
                     <?php else: ?>
-                        <button class="copy-btn nav-btn" disabled>Next</button>
+                        <button class="copy-btn nav-btn" disabled data-i18n="view.next">Next</button>
                     <?php endif; ?>
                 </div>
             <?php endif; ?>
         <?php else: ?>
-            <p>No content available.</p>
+            <p data-i18n="view.noContent">No content available.</p>
         <?php endif; ?>
     </div>
 
-    <button class="zen-exit-btn" onclick="toggleZenMode()">Exit Zen Mode</button>
+    <button class="zen-exit-btn" onclick="toggleZenMode()" data-i18n="view.exitZen">Exit Zen Mode</button>
 
     <footer class="site-footer">
         <div class="container">
             <hr>
-            <p>&copy; 2026 KitePad. All rights reserved. <a href="https://github.com/irhdab/kitepad/tree/main"
-                    class="nav-link" target="_blank">GitHub</a> | <a href="/contact.html" class="nav-link">Contact</a> |
-                <a href="/privacy.html" class="nav-link">Privacy
+            <p>&copy; 2026 KitePad. <span data-i18n="footer.rights">All rights reserved.</span> <a href="https://github.com/irhdab/kitepad/tree/main"
+                    class="nav-link" target="_blank" data-i18n="common.github">GitHub</a> | <a href="/contact.html" class="nav-link" data-i18n="nav.contact">Contact</a> |
+                <a href="/privacy.html" class="nav-link" data-i18n="nav.privacy">Privacy
                     Policy</a>
             </p>
         </div>
